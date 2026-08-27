@@ -22,84 +22,78 @@
 
 #include <Arduino.h>
 #include <chrono>
-#include "error.cpp"
+#include "include/error.hpp"
+#include "include/module.h"
 #define SHARED_DIR_PIN 21
 #define SHARED_STEP_PIN 22
 #define LOAD_TIMEOUT_MS 5000
 #define ENGAGE_TIMEOUT_MS 5000
-class Module {
-    private:
-        int enable;
-        int id;
-        /*
-            Sensors:
-                module sensor   -- per slot, past the drive gear
-                printer sensor  -- at the printer
-        */
-        bool Module::sensedFilamentInPrinter() {
-            // @TODO: sense filament
-            return true;
-        }
-        bool Module::sensedFilament() {
-            // @TODO: sense filament
-            return true;
-        }
-    public:
-        Module::Module(int pin) {
-            this->enable = LOW;
-            this->id = pin;
-        }
+#define PLUS_FREQUENCY 500
+Module::Module(int pin) {
+    this->enable = LOW;
+    this->id = pin;
+}
 
-        void Module::load() {
-            /*
-                LOAD  (filament starts before the module sensor)
-                A) cross module sensor. If not: out of filament, or stuck.
-                B) keep feeding to printer sensor -> stop.
-                First is a health check. Second is where we actually stop.
-            */
-            // SETUP
-            digitalWrite(SHARED_STEP_PIN, LOW);
+bool Module::sensedFilamentInPrinter() {
+    // @TODO: sense filament
+    return true;
+}
 
-            digitalWrite(SHARED_DIR_PIN, HIGH);
-            bool engaged = false;
-            uint32_t start = millis();
-            while (!sensedFilamentInPrinter()) {
-                if (!engaged) {
-                    if (sensedFilament()) {
-                        engaged = true;
-                        start = millis();
-                    } else if (millis() - start > ENGAGE_TIMEOUT_MS) {
-                        AppErrorInit init;
-                        init.status = 500;
-                        init.code = "!ENGAGED";
-                        throw ModuleError("Filament not engaged with Module Filament Sensor", init);
-                    }
-                } else if (millis() - start > LOAD_TIMEOUT_MS) {
-                    AppErrorInit init;
-                    init.status = 500;
-                    init.code = "TIMEOUT";
-                    throw ModuleError("Filament swap took too long", init);
-                };
-                digitalWrite(SHARED_STEP_PIN, HIGH);
-                delay(500);
+bool Module::sensedFilament() {
+    // @TODO: sense filament
+    return true;
+}
+void Module::load() {
+    /*
+        LOAD  (filament starts before the module sensor)
+        A) cross module sensor. If not: out of filament, or stuck.
+        B) keep feeding to printer sensor -> stop.
+        First is a health check. Second is where we actually stop.
+    */
+    // SETUP
+    digitalWrite(SHARED_STEP_PIN, LOW);
+    digitalWrite(SHARED_DIR_PIN, HIGH);
+    bool engaged = false;
+    uint32_t start = millis();
+
+    while (!this->sensedFilamentInPrinter()) {
+        if (!engaged) {
+            if (this->sensedFilament()) {
+                engaged = true;
+                start = millis();
+            } else if (millis() - start > ENGAGE_TIMEOUT_MS) {
+                AppErrorInit init;
+                init.status = 500;
+                init.code = "!ENGAGED";
+                throw TimeAnamoly();
             }
-            
-        }
+        } else if (millis() - start > LOAD_TIMEOUT_MS) {
+            AppErrorInit init;
+            init.status = 500;
+            init.code = "TIMEOUT";
+            throw ModuleError("Filament swap took too long", init);
+        };
+        digitalWrite(SHARED_STEP_PIN, HIGH);
+        delay(PLUS_FREQUENCY);
+        digitalWrite(SHARED_STEP_PIN, LOW);
+        delay(PLUS_FREQUENCY);
+    }
+    
+}
 
-        void Module::unLoad() {
-            /*
-                UNLOAD
-                A) health check: filament leaves the printer within threshold.
-                If not, throw an error.
-                B) keep unloading until the module sensor stops sensing it.
-            */
-            // SETUP
-            digitalWrite(SHARED_STEP_PIN, LOW);
+void Module::unLoad() {
+    /*
+        UNLOAD
+        A) health check: filament leaves the printer within threshold.
+        If not, throw an error.
+        B) keep unloading until the module sensor stops sensing it.
+    */
+    // SETUP
+    digitalWrite(SHARED_STEP_PIN, LOW);
 
-            digitalWrite(SHARED_DIR_PIN, LOW);
-            while (!this->sensedFilament()) {
-                digitalWrite(SHARED_STEP_PIN, LOW);
-                delay(500);
-            }
-        }
-};
+    digitalWrite(SHARED_DIR_PIN, LOW);
+    while (!this->sensedFilament()) {
+        digitalWrite(SHARED_STEP_PIN, LOW);
+        delay(PLUS_FREQUENCY);
+    }
+}

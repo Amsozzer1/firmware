@@ -1,37 +1,40 @@
-
+#pragma once
 #include <exception>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <ArduinoJson.h>
+#include "utils.hpp"
 
-#include "utils.cpp"
+using JsonText = std::string;
 
 struct AppErrorClientPayload {
     std::vector<std::string> errors;
     std::string errorId;
     std::optional<std::string> requestId;
     std::optional<std::string> code;
-    std::optional<nlohmann::json> expose;
+    std::optional<JsonText> expose;
 };
 
-// Mirrors the TS spread-if-defined behavior: absent keys are omitted, not null.
-inline void to_json(nlohmann::json& j, const AppErrorClientPayload& p) {
-    j = nlohmann::json{{"errors", p.errors}, {"errorId", p.errorId}};
-    if (p.requestId) j["requestId"] = *p.requestId;
-    if (p.code) j["code"] = *p.code;
-    if (p.expose) j["expose"] = *p.expose;
+inline void toJson(JsonDocument& doc, const AppErrorClientPayload& p) {
+    JsonArray errs = doc["errors"].to<JsonArray>();
+    for (const auto& e : p.errors) errs.add(e);
+    doc["errorId"] = p.errorId;
+    if (p.requestId) doc["requestId"] = *p.requestId;
+    if (p.code)      doc["code"]      = *p.code;
+    if (p.expose)    doc["expose"]    = serialized(*p.expose);
 }
+
 
 struct AppErrorInit {
     std::optional<int> status;
     std::optional<std::string> name;
     std::optional<std::string> code;
-    std::optional<nlohmann::json> expose;
-    std::optional<nlohmann::json> debug;
-    std::optional<nlohmann::json> cause;
+    std::optional<JsonText> expose;
+    std::optional<JsonText> debug;
+    std::optional<JsonText> cause;
     std::optional<std::string> errorId;
 };
 
@@ -41,9 +44,9 @@ public:
     std::string name;
     int status;
     std::optional<std::string> code;
-    std::optional<nlohmann::json> expose;
-    std::optional<nlohmann::json> debug;
-    std::optional<nlohmann::json> cause;
+    std::optional<JsonText> expose;
+    std::optional<JsonText> debug;
+    std::optional<JsonText> cause;
     std::string errorId;
 
     explicit AppError(std::string message, AppErrorInit init = {})
@@ -54,7 +57,7 @@ public:
           expose(std::move(init.expose)),
           debug(std::move(init.debug)),
           cause(std::move(init.cause)),
-          errorId(init.errorId ? *std::move(init.errorId) : uuid::generate_uuid_v4()) {}
+          errorId(init.errorId ? *std::move(init.errorId) : generateUuidV4()) {}
 
     [[nodiscard]] AppErrorClientPayload toClientPayload(
         std::optional<std::string> requestId = std::nullopt) const {
@@ -93,4 +96,17 @@ class ModuleError : public AppError {
         if (!init.status) init.status = 500;
         return init;
     };
+};
+class TimeAnamoly: public ModuleError {
+    public:
+        explicit TimeAnamoly(
+            std::string message = "Filament not engaged with Module Filament Sensor",
+            AppErrorInit init = {}
+        ): ModuleError(std::move(message), withDefaults(init)){}
+    private:
+        static AppErrorInit withDefaults(AppErrorInit init) {
+            if (!init.name) init.name = "ModuleError";
+            if (!init.status) init.status = 500;
+            return init;
+        };
 };

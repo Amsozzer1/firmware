@@ -1,0 +1,39 @@
+Firmware — what I want
+Scope: The firmware project holds at most 16 modules.
+Each module has its own sensor and a motor. The motor isn't really part of anything directly — we can't talk to the motor, so we talk to the TMC2209, our motor driver. So per module we're talking to a stepper motor (via the driver) and a sensor.
+
+Sensors: There are two:
+
+Printer sensor — inside the printer, already exists. We communicate about it with the server directly; there will be a route for that.
+Internal sensor — our own, per module.
+Maybe a weight sensor per module at some point. Not necessary right now.
+
+What the ESP32 does:
+The ESP32 hosts a C++ web server and listens. It gets called when it needs to load or unload, and maybe for some health checks — but 
+for the most part that's its main purpose: load one of the 16 modules, or unload one of the 16 modules. 
+It receives information about which one to act on.
+
+The web server
+Takes as parameters which module to load and which module to unload.
+
+It does not respond until we are certain of the outcome — loaded, not loaded, or error.
+
+When the error is heard back at the Brain server level, the backend makes it clear: it sends the poll to the frontend that something went wrong and you should go check.
+
+Internal structure
+main.cpp holds the server.
+The server only talks to the Cluster.
+The Cluster arranges the modules. Because it arranges them, it knows what to do and what not to do. It's the brain of the firmware.
+Pin mapping
+The brain does not need to know exactly what pin — it just needs a mapping. Maybe index-based, maybe something else.
+
+Maybe it makes sense for that to come from a config. Maybe the brain should have an organize endpoint the frontend can target, and organize 
+comes from our config — amsx.local.config.json.
+
+Yeah — it would make more sense if we did that, honestly.
+
+Endpoints
+Three, as of right now:
+set config
+load
+unload
