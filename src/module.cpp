@@ -61,12 +61,7 @@ void Module::load() {
             if (this->sensedFilament()) {
                 engaged = true;
                 start = millis();
-            } else if (millis() - start > ENGAGE_TIMEOUT_MS) {
-                AppErrorInit init;
-                init.status = 500;
-                init.code = "!ENGAGED";
-                throw TimeAnamoly();
-            }
+            } else if (millis() - start > ENGAGE_TIMEOUT_MS) throw TimeAnamoly();
         } else if (millis() - start > LOAD_TIMEOUT_MS) {
             AppErrorInit init;
             init.status = 500;
@@ -90,10 +85,27 @@ void Module::unLoad() {
     */
     // SETUP
     digitalWrite(SHARED_STEP_PIN, LOW);
-
     digitalWrite(SHARED_DIR_PIN, LOW);
-    while (!this->sensedFilament()) {
+    bool engaged = true;
+    uint32_t start = millis();
+    while (this->sensedFilament()) {
+        if (engaged) {
+            if (!this->sensedFilamentInPrinter()) {
+                engaged = false;
+                start = millis();
+            } else if (millis() - start > ENGAGE_TIMEOUT_MS) {
+                throw TimeAnamoly();
+            }
+        } else if (millis() - start > LOAD_TIMEOUT_MS) {
+            AppErrorInit init;
+            init.status = 500;
+            init.code = "TIMEOUT";
+            throw ModuleError("Filament swap took too long", init);
+        };
         digitalWrite(SHARED_STEP_PIN, LOW);
         delay(PLUS_FREQUENCY);
+        digitalWrite(SHARED_STEP_PIN, HIGH);
+        delay(PLUS_FREQUENCY);
     }
+
 }
