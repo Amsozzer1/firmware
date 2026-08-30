@@ -3,13 +3,13 @@
 #include "error.hpp"
 #include "constants.h"
 #include <MqttClient.h>
-class Network {
+class WifiNetwork {
     private:
         IPAddress TEST_SERVER = IPAddress(74,125,115,105);
     public:
         int status;
         WiFiClient wifi;
-        Network(char ssid[], char password[]) {
+        WifiNetwork(char ssid[], char password[]) {
             WiFi.begin(ssid, password);
             this->status = WiFi.waitForConnectResult();
             if ( status != WL_CONNECTED) {

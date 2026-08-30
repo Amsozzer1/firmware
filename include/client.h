@@ -1,3 +1,4 @@
+#pragma once
 #include "network.hpp"
 class _____System: public MqttClient::System {
     public:
@@ -8,9 +9,9 @@ class _____System: public MqttClient::System {
 
 class Mqtt_ESP_Client {
 
-    Network* network; // WIFI network
+    WifiNetwork* network; // WIFI network
     MqttClient* mqtt; // the real mqtt client
-    MqttClient::Network * mqttNetwork;
+    MqttClient::Network* mqttNetwork;
     MqttClient::System *mqttSystem;
     MqttClient::Logger *mqttLogger;
     MqttClient::Buffer *mqttSendBuffer;
@@ -21,6 +22,6 @@ class Mqtt_ESP_Client {
     
 
     public:
-        Mqtt_ESP_Client(Network*);
+        Mqtt_ESP_Client(WifiNetwork*);
         void setHandler(const char*, void(MqttClient::MessageData&));
 };

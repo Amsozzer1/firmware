@@ -1,6 +1,6 @@
 #include "client.h"
 
-Mqtt_ESP_Client::Mqtt_ESP_Client(Network* network) {
+Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* network) {
     this->mqttSystem = new _____System();
     this->mqttNetwork = new MqttClient::NetworkClientImpl<Client>(network->wifi, *mqttSystem);
     this->mqttLogger = new MqttClient::LoggerImpl<HardwareSerial>(Serial);

@@ -19,7 +19,7 @@ void setup() {
     Serial.begin(115200, SERIAL_8N1);
 
 
-    Network* network = new Network(Constants::ssid, Constants::pass);
+    WifiNetwork* network = new WifiNetwork(Constants::ssid, Constants::pass);
     Mqtt_ESP_Client client = Mqtt_ESP_Client(network);
     
 }
