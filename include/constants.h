@@ -8,9 +8,9 @@ class Constants {
         static inline constexpr int LOAD_TIMEOUT_MS { 5000 };
         static inline constexpr int ENGAGE_TIMEOUT_MS { 5000 };
         static inline constexpr int PLUS_FREQUENCY { 500 };
-        static inline constexpr char* MQTT_HOST { "127.0.0.1" };
+        static inline constexpr const char* MQTT_HOST { "127.0.0.1" };
         static inline constexpr int MQTT_PORT { 1883 };
         // MOVE TO ENV AT SOME POINT
-        static inline constexpr char* ssid { "Sozzer" };  
-        static inline constexpr char* pass { "Bluebash" };
+        static inline constexpr const char* ssid { "Sozzer" };  
+        static inline constexpr const char* pass { "Bluebash" };
 };

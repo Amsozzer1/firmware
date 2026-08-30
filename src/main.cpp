@@ -1,15 +1,13 @@
-#pragma once
 #include <Arduino.h>
 #include <MqttClient.h>
 #include <WiFi.h>
 #include "error.hpp"
 #include "constants.h"
 #include "network.hpp"
-#include "client.h"
+#include "mqtt_esp_client.hpp"
 
 #define HW_UART_SPEED    57600L // Check this 
 
-#define MQTT_LOG_ENABLED 1
 
 
 
@@ -19,8 +17,8 @@ void setup() {
     Serial.begin(115200, SERIAL_8N1);
 
 
-    WifiNetwork* network = new WifiNetwork(Constants::ssid, Constants::pass);
-    Mqtt_ESP_Client client = Mqtt_ESP_Client(network);
+    WifiNetwork* wifiNetwork = new WifiNetwork(Constants::ssid, Constants::pass);
+    Mqtt_ESP_Client client = Mqtt_ESP_Client(wifiNetwork);
     
 }
 

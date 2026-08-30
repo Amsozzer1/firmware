@@ -9,7 +9,7 @@ class WifiNetwork {
     public:
         int status;
         WiFiClient wifi;
-        WifiNetwork(char ssid[], char password[]) {
+        WifiNetwork(const char ssid[], const char password[]) {
             WiFi.begin(ssid, password);
             this->status = WiFi.waitForConnectResult();
             if ( status != WL_CONNECTED) {
