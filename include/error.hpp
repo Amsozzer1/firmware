@@ -8,6 +8,7 @@
 #include <ArduinoJson.h>
 #include "utils.hpp"
 
+// @TODO: Maybe replace this with logger for MQTT-broker over on Brain?
 using JsonText = std::string;
 
 struct AppErrorClientPayload {
@@ -73,18 +74,6 @@ public:
     const char* what() const noexcept override { return message.c_str(); }
 };
 
-class HttpError : public AppError {
-public:
-    explicit HttpError(std::string message = "Internal Server Error", AppErrorInit init = {})
-        : AppError(std::move(message), withDefaults(std::move(init))) {}
-
-private:
-    static AppErrorInit withDefaults(AppErrorInit init) {
-        if (!init.name) init.name = "HTTPError";
-        if (!init.status) init.status = 500;
-        return init;
-    }
-};
 
 class ModuleError : public AppError {
     public:

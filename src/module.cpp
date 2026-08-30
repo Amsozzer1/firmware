@@ -22,13 +22,8 @@
 
 #include <Arduino.h>
 #include <chrono>
-#include "include/error.hpp"
-#include "include/module.h"
-#define SHARED_DIR_PIN 21
-#define SHARED_STEP_PIN 22
-#define LOAD_TIMEOUT_MS 5000
-#define ENGAGE_TIMEOUT_MS 5000
-#define PLUS_FREQUENCY 500
+#include "error.hpp"
+#include "module.h"
 Module::Module(int pin) {
     this->enable = LOW;
     this->id = pin;
@@ -51,8 +46,8 @@ void Module::load() {
         First is a health check. Second is where we actually stop.
     */
     // SETUP
-    digitalWrite(SHARED_STEP_PIN, LOW);
-    digitalWrite(SHARED_DIR_PIN, HIGH);
+    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+    digitalWrite(Constants::SHARED_DIR_PIN, HIGH);
     bool engaged = false;
     uint32_t start = millis();
 
@@ -61,17 +56,17 @@ void Module::load() {
             if (this->sensedFilament()) {
                 engaged = true;
                 start = millis();
-            } else if (millis() - start > ENGAGE_TIMEOUT_MS) throw TimeAnamoly();
-        } else if (millis() - start > LOAD_TIMEOUT_MS) {
+            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) throw TimeAnamoly();
+        } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
             AppErrorInit init;
             init.status = 500;
             init.code = "TIMEOUT";
             throw ModuleError("Filament swap took too long", init);
         };
-        digitalWrite(SHARED_STEP_PIN, HIGH);
-        delay(PLUS_FREQUENCY);
-        digitalWrite(SHARED_STEP_PIN, LOW);
-        delay(PLUS_FREQUENCY);
+        digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
+        delay(Constants::PLUS_FREQUENCY);
+        digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+        delay(Constants::PLUS_FREQUENCY);
     }
     
 }
@@ -84,8 +79,8 @@ void Module::unLoad() {
         B) keep unloading until the module sensor stops sensing it.
     */
     // SETUP
-    digitalWrite(SHARED_STEP_PIN, LOW);
-    digitalWrite(SHARED_DIR_PIN, LOW);
+    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+    digitalWrite(Constants::SHARED_DIR_PIN, LOW);
     bool engaged = true;
     uint32_t start = millis();
     while (this->sensedFilament()) {
@@ -93,19 +88,19 @@ void Module::unLoad() {
             if (!this->sensedFilamentInPrinter()) {
                 engaged = false;
                 start = millis();
-            } else if (millis() - start > ENGAGE_TIMEOUT_MS) {
+            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) {
                 throw TimeAnamoly();
             }
-        } else if (millis() - start > LOAD_TIMEOUT_MS) {
+        } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
             AppErrorInit init;
             init.status = 500;
             init.code = "TIMEOUT";
             throw ModuleError("Filament swap took too long", init);
         };
-        digitalWrite(SHARED_STEP_PIN, LOW);
-        delay(PLUS_FREQUENCY);
-        digitalWrite(SHARED_STEP_PIN, HIGH);
-        delay(PLUS_FREQUENCY);
+        digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+        delay(Constants::PLUS_FREQUENCY);
+        digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
+        delay(Constants::PLUS_FREQUENCY);
     }
 
 }

@@ -1,0 +1,11 @@
+{
+    "id": 0,
+    "step_pin": 21,
+    "dir_pin": 22,
+    "modules": [
+        {
+            "enable_pin": 23,
+            "sensor_pin": 0
+        }
+    ]
+}

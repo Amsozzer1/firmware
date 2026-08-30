@@ -4,7 +4,24 @@
     Components:
         - TMC2209 - Driver
         - NEMA 17 - Stepper Motor
-        - Filament Sensor
+        - Filament Sensor - undecided
 
 */
 #include "module.h"
+#include "constants.h"
+enum State { idle, busy };
+
+
+class Cluster
+{
+    private:
+        State curr_state = idle;
+        Module* active = nullptr;
+        Module* modules[Constants::CLUSTER_SIZE];
+
+
+    public:
+        Cluster();
+        ~Cluster();
+        void setConfig();
+};
