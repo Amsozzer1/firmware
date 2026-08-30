@@ -64,9 +64,9 @@ void Module::load() {
             throw ModuleError("Filament swap took too long", init);
         };
         digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
-        delay(Constants::PLUS_FREQUENCY);
+        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
         digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-        delay(Constants::PLUS_FREQUENCY);
+        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
     }
     
 }
@@ -98,9 +98,9 @@ void Module::unLoad() {
             throw ModuleError("Filament swap took too long", init);
         };
         digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-        delay(Constants::PLUS_FREQUENCY);
+        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
         digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
-        delay(Constants::PLUS_FREQUENCY);
+        delay(Constants::PLUS_FREQUENCY_MS);
     }
 
 }

@@ -7,7 +7,7 @@ class Constants {
         static inline constexpr int SHARED_STEP_PIN { 22 };
         static inline constexpr int LOAD_TIMEOUT_MS { 5000 };
         static inline constexpr int ENGAGE_TIMEOUT_MS { 5000 };
-        static inline constexpr int PLUS_FREQUENCY { 500 };
+        static inline constexpr int PLUS_FREQUENCY_MS { 500 };
 
         // @TODO: 127.0.0.1 is the ESP32 itself -- set this to the LAN IP or
         // hostname of the machine running the broker before flashing.
@@ -18,6 +18,8 @@ class Constants {
         static inline constexpr const char* PRINTER_REPORT { "printer/report" };
         // Publish to this channel to write the ESP32 State
         static inline constexpr const char* ESP_REPORT { "esp/report" };
+        static inline constexpr const char* ESP_REPORT { "esp/request" };
+
 
         static inline constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS { 15000 };
         // How long to wait between broker reconnect attempts.
