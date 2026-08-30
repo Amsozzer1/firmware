@@ -98,7 +98,7 @@ void Mqtt_ESP_Client::run_loop() {
         return;
     }
 
-    // @TODO:  this is just test, DUHH
+    // @TODO:  this is just test, DUHH, create the real implementation
     if ((now - this->lastPublishMs) >= Constants::PUBLISH_INTERVAL_MS) {
         this->lastPublishMs = now;
         const char* buf = "Hello";

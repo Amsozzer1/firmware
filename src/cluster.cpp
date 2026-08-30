@@ -1,4 +1,4 @@
-#include "include/cluster.h"
+#include "cluster.h"
 
 Cluster::Cluster(){}
 Cluster::~Cluster(){
