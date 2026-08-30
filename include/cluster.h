@@ -9,7 +9,7 @@
 */
 #include "module.h"
 #include "constants.h"
-
+#include "config.h"
 
 class Cluster
 {
@@ -20,7 +20,8 @@ class Cluster
 
     public:
         Cluster();
+        Cluster(Config);
         ~Cluster();
-        void setConfig();
-        bool isAvailable(){ return active == nullptr; };
+        void setConfig(Config);
+        bool isAvailable() { return active == nullptr; };
 };

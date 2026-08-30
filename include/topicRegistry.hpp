@@ -12,8 +12,9 @@ public:
         }
         macStr_[12] = '\0';
 
-        build(printerReport_, "printer/", "/report");
-        build(espReport_,     "esp/",     "/report");
+        build(espSetup_, "esp/", "setup"); // THIS CHANNEL IS ONLY FOR SETUP AND EVERY LISTEN ON THIS CAN MEAN RESTARTING THE ESP
+        build(printerReport_, "printer/", "/report"); // to read printer state -> filamentPresenceSensor
+        build(espReport_,     "esp/",     "/report"); // PUBLISH active modules state 
         build(espRequest_,    "esp/",     "/request");
     }
 
