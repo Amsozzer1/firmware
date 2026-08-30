@@ -1,10 +1,11 @@
 #pragma once
-
+#include "topicRegistry.hpp"
 class Constants {
     public:
         static inline const char* MQTT_ID { TopicRegistry::macStr() };
+        static inline constexpr int BUFFER_SIZE {128}; 
         
-        // @TODO: Config ?  
+        // @TODO: Config ? 
         static inline constexpr int CLUSTER_SIZE{ 16 };
         static inline constexpr int SHARED_DIR_PIN { 21 };
         static inline constexpr int SHARED_STEP_PIN { 22 };

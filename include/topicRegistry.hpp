@@ -15,7 +15,7 @@ public:
         build(espSetup_, "esp/", "setup"); // THIS CHANNEL IS ONLY FOR SETUP AND EVERY LISTEN ON THIS CAN MEAN RESTARTING THE ESP
         build(printerReport_, "printer/", "/report"); // to read printer state -> filamentPresenceSensor
         build(espReport_,     "esp/",     "/report"); // PUBLISH active modules state 
-        build(espRequest_,    "esp/",     "/request");
+        build(espRequest_,    "esp/",     "/request"); // Read this to know when we get load/unload command is recieved 
     }
 
     static const uint8_t* mac()    { return mac_; }
@@ -26,6 +26,7 @@ public:
     // Publish to this channel to write the ESP32 State
     static const char* espReport()     { return espReport_; }
     static const char* espRequest()    { return espRequest_; }
+    static const char* espSetup()      { return espSetup_; }
 
 private:
     static constexpr size_t kMaxTopic = 32;
@@ -47,4 +48,5 @@ private:
     static inline char    printerReport_[kMaxTopic]{};
     static inline char    espReport_[kMaxTopic]{};
     static inline char    espRequest_[kMaxTopic]{};
+    static inline char    espSetup_[kMaxTopic]{};
 };

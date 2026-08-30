@@ -8,6 +8,6 @@ Cluster::~Cluster(){
     }
 };
 
-void Cluster::setConfig(){
+void Cluster::setConfig(Config config){
 
 }

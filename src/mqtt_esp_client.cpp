@@ -9,8 +9,8 @@ Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     this->mqttSystem = new _____System();
     this->mqttNetwork = new MqttClient::NetworkClientImpl<Client>(net->wifi, *mqttSystem);
     this->mqttLogger = new MqttClient::LoggerImpl<HardwareSerial>(Serial);
-    this->mqttSendBuffer = new MqttClient::ArrayBuffer<128>();
-    this->mqttRecvBuffer = new MqttClient::ArrayBuffer<128>();
+    this->mqttSendBuffer = new MqttClient::ArrayBuffer<Constants::BUFFER_SIZE>();
+    this->mqttRecvBuffer = new MqttClient::ArrayBuffer<Constants::BUFFER_SIZE>();
     this->mqttMessageHandlers = new MqttClient::MessageHandlersImpl<2>();
     this->mqttOptions.commandTimeoutMs = 10000;
 
