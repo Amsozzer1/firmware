@@ -1,5 +1,6 @@
 #pragma once
 #include "network.hpp"
+#include "config.h"
 class _____System: public MqttClient::System {
     public:
         unsigned long millis() const {
@@ -24,7 +25,8 @@ class Mqtt_ESP_Client {
     bool hasAttemptedConnect;
     unsigned long lastConnectAttemptMs;
     unsigned long lastPublishMs;
-
+    bool pinsConfigured;
+    bool setupPins(Config);
     bool reconnect();
 
     public:

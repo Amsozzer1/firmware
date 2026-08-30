@@ -19,6 +19,7 @@ class Constants {
         // Publish to this channel to write the ESP32 State
         static inline constexpr const char* ESP_REPORT { "esp/report" };
         static inline constexpr const char* ESP_REPORT { "esp/request" };
+        static inline std::string ESP_SETUP(int id) { return "esp/" + std::to_string(id) + "/state"; };
 
 
         static inline constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS { 15000 };

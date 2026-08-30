@@ -3,6 +3,7 @@
 Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     // This assignment was missing, so `this->network` held whatever `new` left
     // behind and the first run_loop() faulted on it.
+    this->pinsConfigured = false;
     this->network = net;
 
     this->mqttSystem = new _____System();
@@ -81,7 +82,14 @@ bool Mqtt_ESP_Client::reconnect() {
     Serial.printf("MQTT: connected, subscribed to %s\n", Constants::PRINTER_REPORT);
     return true;
 }
+bool Mqtt_ESP_Client::setupPins(Config pinConf) {
+    if (this->pinsConfigured) return true;
+    /* @TODO: Takes the config from MQTT and setups the pins for example
+        digitalWrite(PIN, OUTPUT);
+    */
+    return false;
 
+}
 void Mqtt_ESP_Client::run_loop() {
     const unsigned long now = millis();
 
@@ -98,6 +106,9 @@ void Mqtt_ESP_Client::run_loop() {
         return;
     }
 
+    Config pinConf; // @TODO: This will be read from MQTT setup Topic
+    if (!this->setupPins(pinConf)) { /* @TODO add the correct way to throw once conf*/ }
+    
     // @TODO:  this is just test, DUHH, create the real implementation
     if ((now - this->lastPublishMs) >= Constants::PUBLISH_INTERVAL_MS) {
         this->lastPublishMs = now;
