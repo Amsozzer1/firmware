@@ -19,9 +19,15 @@ class Mqtt_ESP_Client {
     MqttClient::MessageHandlers *mqttMessageHandlers;
 
     MqttClient::Options mqttOptions;
-    
+
+    bool hasAttemptedConnect;
+    unsigned long lastConnectAttemptMs;
+    unsigned long lastPublishMs;
+
+    bool reconnect();
 
     public:
         Mqtt_ESP_Client(WifiNetwork*);
         void setHandler(const char*, void(MqttClient::MessageData&));
+        void run_loop();
 };
