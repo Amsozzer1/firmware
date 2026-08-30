@@ -100,7 +100,7 @@ void Module::unLoad() {
         digitalWrite(Constants::SHARED_STEP_PIN, LOW);
         delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
         digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
-        delay(Constants::PLUS_FREQUENCY_MS);
+        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
     }
 
 }

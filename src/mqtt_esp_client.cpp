@@ -70,7 +70,7 @@ bool Mqtt_ESP_Client::reconnect() {
 
     {
         MqttClient::Error::type rc =
-            this->mqtt->subscribe(Constants::PRINTER_REPORT, MqttClient::QOS1);
+            this->mqtt->subscribe(TopicRegistry::printerReport(), MqttClient::QOS1);
         if (rc != MqttClient::Error::SUCCESS) {
             Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
             this->mqtt->disconnect();
@@ -79,7 +79,7 @@ bool Mqtt_ESP_Client::reconnect() {
         }
     }
 
-    Serial.printf("MQTT: connected, subscribed to %s\n", Constants::PRINTER_REPORT);
+    Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::printerReport());
     return true;
 }
 bool Mqtt_ESP_Client::setupPins(Config pinConf) {
@@ -119,8 +119,8 @@ void Mqtt_ESP_Client::run_loop() {
         message.dup = false;
         message.payload = (void*) buf;
         message.payloadLen = strlen(buf);
-        this->mqtt->publish(Constants::ESP_REPORT, message);
+        this->mqtt->publish(TopicRegistry::espReport(), message);
     }
 
-    this->mqtt->yield(500);
+    if (!this->pinsConfigured) this->mqtt->yield(500);
 }

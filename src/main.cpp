@@ -5,9 +5,8 @@
 #include "constants.h"
 #include "network.hpp"
 #include "mqtt_esp_client.hpp"
-
+#include "topicRegistry.hpp"
 #define HW_UART_SPEED    57600L // Check this 
-
 
 
 WifiNetwork* wifiNetwork;
@@ -18,7 +17,7 @@ void setup() {
     while (!Serial && millis() < 2000) {
         // give USB-CDC a moment so the boot logs aren't lost
     }
-
+    TopicRegistry::begin();
     wifiNetwork = new WifiNetwork(Constants::ssid, Constants::pass);
     client = new Mqtt_ESP_Client(wifiNetwork);
 }

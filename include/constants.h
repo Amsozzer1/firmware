@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Constants {
     public:
@@ -14,13 +15,6 @@ class Constants {
         static inline constexpr const char* MQTT_HOST { "192.168.1.81" };
         static inline constexpr int MQTT_PORT { 1883 };
         static inline constexpr const char* MQTT_ID {"TEST-ID"};
-        // Subscribe to this channel to read Printer State
-        static inline constexpr const char* PRINTER_REPORT { "printer/report" };
-        // Publish to this channel to write the ESP32 State
-        static inline constexpr const char* ESP_REPORT { "esp/report" };
-        static inline constexpr const char* ESP_REPORT { "esp/request" };
-        static inline std::string ESP_SETUP(int id) { return "esp/" + std::to_string(id) + "/state"; };
-
 
         static inline constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS { 15000 };
         // How long to wait between broker reconnect attempts.
