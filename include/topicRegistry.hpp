@@ -12,12 +12,14 @@ public:
         }
         macStr_[12] = '\0';
 
-        build(espSetup_, "esp/", "setup"); // THIS CHANNEL IS ONLY FOR SETUP AND EVERY LISTEN ON THIS CAN MEAN RESTARTING THE ESP
-        build(printerReport_, "printer/", "/report"); // to read printer state -> filamentPresenceSensor
+        build(espSetup_, "esp/", "/setup"); // THIS CHANNEL IS ONLY FOR SETUP AND EVERY LISTEN ON THIS CAN MEAN RESTARTING THE ESP
         build(espReport_,     "esp/",     "/report"); // PUBLISH active modules state 
         build(espRequest_,    "esp/",     "/request"); // Read this to know when we get load/unload command is recieved 
     }
 
+    static void setPrinter(char* printerId) {
+        build(printerReport_, "printer/", "/report", printerId); // to read printer state -> filamentPresenceSensor
+    }
     static const uint8_t* mac()    { return mac_; }
     static const char*    macStr() { return macStr_; }
 
@@ -29,12 +31,12 @@ public:
     static const char* espSetup()      { return espSetup_; }
 
 private:
-    static constexpr size_t kMaxTopic = 32;
+    static constexpr size_t kMaxTopic = 64;
 
-    static void build(char* out, const char* prefix, const char* suffix) {
+    static void build(char* out, const char* prefix, const char* suffix, const char* id=macStr_) {
         char* w = out;
         while (*prefix) *w++ = *prefix++;
-        for (const char* s = macStr_; *s; ++s) *w++ = *s;
+        for (const char* s = id; *s; ++s) *w++ = *s;
         while (*suffix) *w++ = *suffix++;
         *w = '\0';
     }

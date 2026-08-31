@@ -68,9 +68,9 @@ bool Mqtt_ESP_Client::reconnect() {
         }
     }
 
+    // SUBSCRIBING to ESP Setup - this is config setup
     {
-        MqttClient::Error::type rc =
-            this->mqtt->subscribe(TopicRegistry::printerReport(), MqttClient::QOS1);
+        MqttClient::Error::type rc = this->mqtt->subscribe(TopicRegistry::espSetup(), MqttClient::QOS2);
         if (rc != MqttClient::Error::SUCCESS) {
             Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
             this->mqtt->disconnect();
@@ -79,7 +79,7 @@ bool Mqtt_ESP_Client::reconnect() {
         }
     }
 
-    Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::printerReport());
+    Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::espSetup());
     return true;
 }
 bool Mqtt_ESP_Client::setupPins(Config pinConf) {
@@ -103,11 +103,14 @@ void Mqtt_ESP_Client::run_loop() {
         this->hasAttemptedConnect = true;
         this->lastConnectAttemptMs = now;
         this->reconnect();
+        
         return;
     }
 
-    Config pinConf; // @TODO: This will be read from MQTT setup Topic
-    if (!this->setupPins(pinConf)) { /* @TODO add the correct way to throw once conf*/ }
+    //Config pinConf; // @TODO: This will be read from MQTT setup Topic
+    // Also if config isnt set, hit the brain to tell it that we need the config maybe? or should the broker release the 
+    //if (!this->setupPins(pinConf)) { /* @TODO add the correct way to throw once conf*/ }
+    // @TODO: use TopicRegistry::setPrinter(char* printerId) once pinConf is setup
     
     // @TODO:  this is just test, DUHH, create the real implementation
     if ((now - this->lastPublishMs) >= Constants::PUBLISH_INTERVAL_MS) {
@@ -122,5 +125,7 @@ void Mqtt_ESP_Client::run_loop() {
         this->mqtt->publish(TopicRegistry::espReport(), message);
     }
 
-    if (!this->pinsConfigured) this->mqtt->yield(500);
+
+
+    // if (!this->pinsConfigured) this->mqtt->yield(500);
 }

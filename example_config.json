@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "sharedStepPin": 26,
+  "sharedDirPin": 27,
+  "stepIntervalUs": 400,
+  "engageTimeoutMs": 2000,
+  "loadTimeoutMs": 30000,
+  "slots": [
+    { "enablePin": 14, "sensorPin": 34 },
+    { "enablePin": 12, "sensorPin": 35 }
+  ]
+}
