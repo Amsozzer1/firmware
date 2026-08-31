@@ -3,7 +3,7 @@
 class Constants {
     public:
         static inline const char* MQTT_ID { TopicRegistry::macStr() };
-        static inline constexpr int BUFFER_SIZE {256}; 
+        static inline constexpr int BUFFER_SIZE {512}; 
         
         // @TODO: Config ? 
         static inline constexpr int CLUSTER_SIZE{ 16 };

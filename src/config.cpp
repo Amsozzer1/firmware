@@ -1,12 +1,22 @@
 #include "config.h"
 
-
-Config::Config(char* raw_config){
-    {/*IDK WHAT DATA IT TAKES YET AND WHAT IT ENTAILS*/};
-    ArduinoJson::deserializeJson(this->config, raw_config);
-    this->config["printerId"];
+void Config::processMessage(MqttClient::MessageData& md) {
+    Config::begin(md);
 }
 
-void Config::read_file(char* fileName) {
+void Config::begin(MqttClient::MessageData& md) {
+    const MqttClient::Message& msg = md.message;
+
+    DeserializationError err = deserializeJson(
+        Config::config, (const char*) msg.payload, msg.payloadLen
+    );
     
+    if (err) {
+        Serial.printf("Config: bad setup payload (%s)\n", err.c_str());
+        return;
+    }
+
+    Serial.print("Config: ");
+    serializeJson(Config::config, Serial);
+    Serial.println();
 }

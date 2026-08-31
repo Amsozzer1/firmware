@@ -126,6 +126,7 @@ void Mqtt_ESP_Client::run_loop() {
     }
 
 
-
+    // @TODO: this should be it 
     // if (!this->pinsConfigured) this->mqtt->yield(500);
+    this->mqtt->yield(500);
 }
