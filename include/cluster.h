@@ -40,8 +40,5 @@ class Cluster
         static inline int error = 0; 
         static bool isAvailable();
         static size_t currReport (char* out, size_t outLen);
-
-        // Cluster should also be a fully static class since 
-        static void begin();
         static void handleRequest(MqttClient::MessageData&);
 };

@@ -3,10 +3,6 @@ bool Cluster::isAvailable() {
     return Cluster::active == nullptr; 
 };
 
-void Cluster::begin() {
-    // @TODO: IDEK WHAT GOES HERE, IF NONE GET RID
-}
-
 size_t Cluster::currReport(char* out, size_t outLen) {
     // @TODO: keep working on this - maybe have an internal function for this. instead and this just a wrapper with all items as input
     JsonDocument response;

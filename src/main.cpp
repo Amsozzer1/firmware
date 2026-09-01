@@ -19,7 +19,6 @@ void setup() {
 
     // @TODO: add guards here
     TopicRegistry::begin();
-    Cluster::begin();
     
     wifiNetwork = new WifiNetwork(Constants::ssid, Constants::pass);
     client = new Mqtt_ESP_Client(wifiNetwork);

@@ -93,14 +93,7 @@ bool Mqtt_ESP_Client::reconnect() {
     Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::espSetup());
     return true;
 }
-bool Mqtt_ESP_Client::setupPins(Config pinConf) {
-    if (this->pinsConfigured) return true;
-    /* @TODO: Takes the config from MQTT and setups the pins for example
-        digitalWrite(PIN, OUTPUT);
-    */
-    return false;
 
-}
 void Mqtt_ESP_Client::run_loop() {
     const unsigned long now = millis();
 
