@@ -40,7 +40,6 @@ void Request::handleRequest(const char* json, size_t len) {
 
     req.slot = request["slot"];
 
-    // @TODO: FIGURE THIS OUT
     if (cmd !=Request::Command::ABORT && !Cluster::isAvailable()) {
         Fault::raise(Fault::BUSY);
         return;

@@ -118,9 +118,10 @@ void Mqtt_ESP_Client::run_loop() {
             char buf[Constants::BUFFER_SIZE];
             size_t n = Config::configured
                 ? Cluster::currReport(buf, sizeof(buf))
-                : snprintf(buf, sizeof(buf), "Not Setup"); // @TODO: replace with the proper Error implementation
+                : snprintf(buf, sizeof(buf), "Not Setup");
             if (n == 0 || n >= sizeof(buf) - 1) {
                 Serial.println("Report did not fit in the buffer, skipping publish");
+                // @TODO: Raise a fault to the brain, increase the BUFFER_SIZE
             } else {
                 Serial.printf("Sending message to Brain: %s \n", buf);
                 MqttClient::Message message;

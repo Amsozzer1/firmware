@@ -14,5 +14,5 @@ class Config {
         static int sharedStepPin;
         static int sharedDirPin;
 
-        static void apply(const char* json, size_t len);   // ← plain bytes
+        static void apply(const char* json, size_t len);
 };
