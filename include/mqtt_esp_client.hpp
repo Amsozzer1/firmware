@@ -2,6 +2,7 @@
 #include "network.hpp"
 #include "config.h"
 #include "topicRegistry.hpp"
+#include "cluster.h"
 class _____System: public MqttClient::System {
     public:
         unsigned long millis() const {

@@ -7,5 +7,6 @@ class Config {
         static inline JsonDocument config{};
         void processMessage(MqttClient::MessageData& md);
         static void begin(MqttClient::MessageData& md);
+        static inline bool configured {false};
 
 };

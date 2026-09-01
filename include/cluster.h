@@ -14,14 +14,14 @@
 class Cluster
 {
     private:
-        Module* active = nullptr;
-        Module* modules[Constants::CLUSTER_SIZE] = {};
+        static inline Module* active {nullptr};
+        static inline Module* modules[Constants::CLUSTER_SIZE] {};
 
 
     public:
-        Cluster();
-        Cluster(Config);
-        ~Cluster();
-        void setConfig(Config);
-        bool isAvailable() { return active == nullptr; };
+        static bool isAvailable();
+        static size_t currReport (char* out, size_t outLen);
+
+        // Cluster should also be a fully static class since 
+        static void begin();
 };

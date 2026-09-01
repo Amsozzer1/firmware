@@ -16,6 +16,8 @@ void Config::begin(MqttClient::MessageData& md) {
         return;
     }
 
+    // @TODO: setup the config properly if need be
+    Config::configured = true;
     Serial.print("Config: ");
     serializeJson(Config::config, Serial);
     Serial.println();

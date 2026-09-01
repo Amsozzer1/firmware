@@ -107,26 +107,29 @@ void Mqtt_ESP_Client::run_loop() {
         return;
     }
 
-    //Config pinConf; // @TODO: This will be read from MQTT setup Topic
-    // Also if config isnt set, hit the brain to tell it that we need the config maybe? or should the broker release the 
-    //if (!this->setupPins(pinConf)) { /* @TODO add the correct way to throw once conf*/ }
-    // @TODO: use TopicRegistry::setPrinter(char* printerId) once pinConf is setup
-    
-    // @TODO:  this is just test, DUHH, create the real implementation
-    if ((now - this->lastPublishMs) >= Constants::PUBLISH_INTERVAL_MS) {
-        this->lastPublishMs = now;
-        const char* buf = "Hello";
-        MqttClient::Message message;
-        message.qos = MqttClient::QOS0;
-        message.retained = false;
-        message.dup = false;
-        message.payload = (void*) buf;
-        message.payloadLen = strlen(buf);
-        this->mqtt->publish(TopicRegistry::espReport(), message);
+    // PUBLISH REPORT TO BROKER
+    {
+        if ((now - this->lastPublishMs) >= Constants::PUBLISH_INTERVAL_MS) {
+            this->lastPublishMs = now;
+
+            char buf[Constants::BUFFER_SIZE];
+            size_t n = Config::configured
+                ? Cluster::currReport(buf, sizeof(buf))
+                : snprintf(buf, sizeof(buf), "Not Setup"); // @TODO: replace with the proper Error implementation
+            if (n == 0) {
+                Serial.println("Report did not fit in the buffer, skipping publish");
+            } else {
+                Serial.printf("Sending message to Brain: %s \n", buf);
+                MqttClient::Message message;
+                message.qos = MqttClient::QOS0;
+                message.retained = false;
+                message.dup = false;
+                message.payload = (void*) buf;
+                message.payloadLen = n;
+                this->mqtt->publish(TopicRegistry::espReport(), message);
+            }
+        }
     }
 
-
-    // @TODO: this should be it 
-    // if (!this->pinsConfigured) this->mqtt->yield(500);
     this->mqtt->yield(500);
 }
