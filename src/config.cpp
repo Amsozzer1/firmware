@@ -1,24 +1,12 @@
 #include "config.h"
 
-void Config::begin(MqttClient::MessageData& md) {
-    if (!Cluster::isAvailable()) return; // @TODO: 
-    const MqttClient::Message& msg = md.message;
-
-    DeserializationError err = deserializeJson(
-        Config::config, (const char*) msg.payload, msg.payloadLen
-    );
-    
-    if (err) {
-        Serial.printf("Config: bad setup payload (%s)\n", err.c_str());
-        return;
-    }
-
-    Config::updatePins();
+void Config::apply(const char* json, size_t len) {
+    DeserializationError err = deserializeJson(Config::config, json, len);
+    if (err) { Serial.printf("Config: bad payload (%s)\n", err.c_str()); return; }
     Config::configured = true;
-    Serial.print("Config: ");
-    serializeJson(Config::config, Serial);
-    Serial.println();
+    Config::updatePins();
 }
+
 
 // @TODO: Update the pin values
 void Config::updatePins() {

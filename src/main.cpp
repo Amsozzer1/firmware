@@ -11,6 +11,10 @@
 WifiNetwork* wifiNetwork;
 Mqtt_ESP_Client* client;
 
+void onSetup(MqttClient::MessageData& md) {
+    Config::apply((const char*)md.message.payload, md.message.payloadLen);
+}
+
 void setup() {
     Serial.begin(115200, SERIAL_8N1);
     while (!Serial && millis() < 2000) {
@@ -23,8 +27,8 @@ void setup() {
     wifiNetwork = new WifiNetwork(Constants::ssid, Constants::pass);
     client = new Mqtt_ESP_Client(wifiNetwork);
 
-    client->setHandler(TopicRegistry::espSetup(), Config::begin);
-    client->setHandler(TopicRegistry::espRequest(), Cluster::handleRequest);
+    client->setHandler(TopicRegistry::espSetup(), onSetup);
+    client->setHandler(TopicRegistry::espRequest(), Request::handleRequest);
 
     Serial.printf("Your Mac Address is %s \n", TopicRegistry::macStr());
 }
