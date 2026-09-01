@@ -1,9 +1,5 @@
 #include "config.h"
 
-void Config::processMessage(MqttClient::MessageData& md) {
-    Config::begin(md);
-}
-
 void Config::begin(MqttClient::MessageData& md) {
     const MqttClient::Message& msg = md.message;
 

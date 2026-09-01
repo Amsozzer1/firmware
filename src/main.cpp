@@ -18,13 +18,15 @@ void setup() {
         // give USB-CDC a moment so the boot logs aren't lost
     }
 
+    // @TODO: add guards here
     TopicRegistry::begin();
     Cluster::begin();
+    
     wifiNetwork = new WifiNetwork(Constants::ssid, Constants::pass);
     client = new Mqtt_ESP_Client(wifiNetwork);
 
     client->setHandler(TopicRegistry::espSetup(), Config::begin);
-    Serial.println(TopicRegistry::espSetup());
+    Serial.printf("Your Mac Address is %s \n", TopicRegistry::macStr());
 }
 
 void loop() {
