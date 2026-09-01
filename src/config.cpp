@@ -12,7 +12,7 @@ void Config::begin(MqttClient::MessageData& md) {
         return;
     }
 
-    // @TODO: setup the config properly if need be
+    // @TODO: Update the pin values
     Config::configured = true;
     Serial.print("Config: ");
     serializeJson(Config::config, Serial);

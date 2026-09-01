@@ -5,7 +5,7 @@ bool Cluster::isAvailable() {
 };
 
 void Cluster::begin() {
-    // @TODO
+    // @TODO:
 }
 
 size_t Cluster::currReport(char* out, size_t outLen) {
@@ -13,5 +13,6 @@ size_t Cluster::currReport(char* out, size_t outLen) {
     JsonDocument response;
     response["connected"] = true;
     response["idle"] = Cluster::isAvailable();
+    response["configRev"] = Config::config["configRev"];
     return serializeJson(response, out, outLen);
 }
