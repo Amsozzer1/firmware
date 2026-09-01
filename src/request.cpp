@@ -1,4 +1,5 @@
 #include "request.h"
+#include "cluster.h"
 
 bool Request::slotRequired(Request::Command cmd) {
     return cmd == Command::LOAD || cmd == Command::UNLOAD;
@@ -6,7 +7,7 @@ bool Request::slotRequired(Request::Command cmd) {
 
 bool Request::isInt(JsonVariant slot) {
     if (slot.isNull() || !slot.is<int>()) return false;
-    return slot;
+    return true;
 }
 
 void Request::handleRequest(MqttClient::MessageData& md) {

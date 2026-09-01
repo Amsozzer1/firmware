@@ -1,4 +1,7 @@
 #include "cluster.h"
+#include "config.h"
+#include "fault.h"
+
 bool Cluster::isAvailable() { 
     return Cluster::active == nullptr; 
 };
@@ -18,11 +21,11 @@ size_t Cluster::currReport(char* out, size_t outLen) {
 
 void Cluster::handleCommand(Request::request req) {
     switch (req.cmd) {
-        case Request::ABORT:   /*@TODO: HANDLE*/ return;
-        case Request::LOAD:    /*@TODO: HANDLE*/ return;
-        case Request::UNLOAD:  /*@TODO: HANDLE*/ return;
-        case Request::RESOLVE: Fault::clean(); return;
-        case Request::UNKNOWN: return;
+        case Request::Command::ABORT:   /*@TODO: HANDLE*/ return;
+        case Request::Command::LOAD:    /*@TODO: HANDLE*/ return;
+        case Request::Command::UNLOAD:  /*@TODO: HANDLE*/ return;
+        case Request::Command::RESOLVE: Fault::clean(); return;
+        case Request::Command::UNKNOWN: return;
     }
 
      

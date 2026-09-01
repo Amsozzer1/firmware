@@ -13,7 +13,6 @@
 #include "request.h"
 class Cluster
 {
-    static void handleCommand(Request);
     private:
         static inline Module* active {nullptr};
         static inline Module* modules[Constants::CLUSTER_SIZE] {};
@@ -22,5 +21,7 @@ class Cluster
         static inline int error = 0; 
         static bool isAvailable();
         static size_t currReport (char* out, size_t outLen);
+        static void handleCommand(Request::request);
+
         
 };
