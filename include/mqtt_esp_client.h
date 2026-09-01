@@ -27,7 +27,6 @@ class Mqtt_ESP_Client {
     bool hasAttemptedConnect;
     unsigned long lastConnectAttemptMs;
     unsigned long lastPublishMs;
-    bool pinsConfigured;
     bool reconnect();
 
     public:

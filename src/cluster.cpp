@@ -65,12 +65,12 @@ void Cluster::handleRequest(MqttClient::MessageData& md) {
 
 void Cluster::handleCommand(Cluster::request req) {
     switch (req.cmd) {
-    case Command::ABORT:   /*@TODO: HANDLE*/ return;
-    case Command::LOAD:    /*@TODO: HANDLE*/ return;
-    case Command::UNLOAD:  /*@TODO: HANDLE*/ return;
-    case Command::RESOLVE: Fault::clean(); return;
-    case Command::UNKNOWN: return;
-}
+        case Command::ABORT:   /*@TODO: HANDLE*/ return;
+        case Command::LOAD:    /*@TODO: HANDLE*/ return;
+        case Command::UNLOAD:  /*@TODO: HANDLE*/ return;
+        case Command::RESOLVE: Fault::clean(); return;
+        case Command::UNKNOWN: return;
+    }
 
      
 }

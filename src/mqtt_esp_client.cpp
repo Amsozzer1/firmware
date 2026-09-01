@@ -3,7 +3,6 @@
 Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     // This assignment was missing, so `this->network` held whatever `new` left
     // behind and the first run_loop() faulted on it.
-    this->pinsConfigured = false;
     this->network = net;
 
     this->mqttSystem = new _____System();
