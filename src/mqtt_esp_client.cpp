@@ -1,4 +1,4 @@
-#include "mqtt_esp_client.hpp"
+#include "mqtt_esp_client.h"
 
 Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     // This assignment was missing, so `this->network` held whatever `new` left

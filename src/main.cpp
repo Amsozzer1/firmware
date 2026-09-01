@@ -3,7 +3,7 @@
 #include <MqttClient.h>
 #include "constants.h"
 #include "network.hpp"
-#include "mqtt_esp_client.hpp"
+#include "mqtt_esp_client.h"
 #include "topicRegistry.hpp"
 #define HW_UART_SPEED    57600L // Check this 
 
