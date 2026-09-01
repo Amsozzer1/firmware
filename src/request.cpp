@@ -10,19 +10,15 @@ bool Request::isInt(JsonVariant slot) {
     return true;
 }
 
-void Request::handleRequest(MqttClient::MessageData& md) {
+void Request::handleRequest(const char* json, size_t len) {
     JsonDocument request;
-    const MqttClient::Message& msg = md.message;
+    Request::request req;
 
-    DeserializationError err = deserializeJson(
-        request, (const char*) msg.payload, msg.payloadLen
-    );
-    
+    DeserializationError err = deserializeJson(request, json, len);
     if (err) {
         Fault::raise(Fault::REQ_UNPROCESSABLE);
         return;
     }
-    Request::request req;
     
     // Check if a valid command and store as cmd
     const char* verb = request["cmd"];

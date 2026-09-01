@@ -5,7 +5,8 @@
 #include "network.hpp"
 #include "mqtt_esp_client.h"
 #include "topicRegistry.hpp"
-#define HW_UART_SPEED    57600L // Check this 
+#include "config.h"
+#include "request.h"
 
 
 WifiNetwork* wifiNetwork;
@@ -14,6 +15,11 @@ Mqtt_ESP_Client* client;
 void onSetup(MqttClient::MessageData& md) {
     Config::apply((const char*)md.message.payload, md.message.payloadLen);
 }
+
+void onRequest(MqttClient::MessageData& md) {
+    Request::handleRequest((const char*)md.message.payload, md.message.payloadLen);
+}
+
 
 void setup() {
     Serial.begin(115200, SERIAL_8N1);
@@ -28,7 +34,7 @@ void setup() {
     client = new Mqtt_ESP_Client(wifiNetwork);
 
     client->setHandler(TopicRegistry::espSetup(), onSetup);
-    client->setHandler(TopicRegistry::espRequest(), Request::handleRequest);
+    client->setHandler(TopicRegistry::espRequest(), onRequest);
 
     Serial.printf("Your Mac Address is %s \n", TopicRegistry::macStr());
 }

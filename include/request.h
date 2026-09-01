@@ -14,7 +14,7 @@ class Request {
 
         static bool slotRequired(Command);
         static bool isInt(JsonVariant);
-        static void handleRequest(MqttClient::MessageData&);
+        static void handleRequest(const char* json, size_t len);
 
     private: 
         static Command parse(const char* s) {
