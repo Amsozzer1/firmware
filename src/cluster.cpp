@@ -38,7 +38,9 @@ void Cluster::handleRequest(MqttClient::MessageData& md) {
     Cluster::request req;
     
     // Check if a valid command and store as cmd
-    Cluster::Command cmd = Cluster::parse(request["cmd"]);
+    const char* verb = request["cmd"];
+    if (verb == nullptr) { Fault::raise(Fault::MISSING_OR_NO_CMD); return; }
+    Cluster::Command cmd = Cluster::parse(verb);
     if (cmd == Cluster::Command::UNKNOWN) {
         Fault::raise(Fault::MISSING_OR_NO_CMD);
         return;

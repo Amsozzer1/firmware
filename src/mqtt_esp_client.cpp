@@ -11,7 +11,7 @@ Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     this->mqttLogger = new MqttClient::LoggerImpl<HardwareSerial>(Serial);
     this->mqttSendBuffer = new MqttClient::ArrayBuffer<Constants::BUFFER_SIZE>();
     this->mqttRecvBuffer = new MqttClient::ArrayBuffer<Constants::BUFFER_SIZE>();
-    this->mqttMessageHandlers = new MqttClient::MessageHandlersImpl<2>();
+    this->mqttMessageHandlers = new MqttClient::MessageHandlersImpl<3>();
     this->mqttOptions.commandTimeoutMs = 10000;
 
     this->hasAttemptedConnect = false;
@@ -71,6 +71,17 @@ bool Mqtt_ESP_Client::reconnect() {
     // SUBSCRIBING to ESP Setup - this is config setup
     {
         MqttClient::Error::type rc = this->mqtt->subscribe(TopicRegistry::espSetup(), MqttClient::QOS2);
+        if (rc != MqttClient::Error::SUCCESS) {
+            Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
+            this->mqtt->disconnect();
+            this->network->disconnectBroker();
+            return false;
+        }
+    }
+
+    // SUBSCRIBING to ESP Request - this Handles a cmd
+    {
+        MqttClient::Error::type rc = this->mqtt->subscribe(TopicRegistry::espRequest(), MqttClient::QOS2);
         if (rc != MqttClient::Error::SUCCESS) {
             Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
             this->mqtt->disconnect();

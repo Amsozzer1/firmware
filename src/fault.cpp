@@ -8,6 +8,6 @@ void Fault::clean() {
 }
 
 void Fault::raise(int code) {
-    Cluster::error = code;
+    if (Cluster::error == Fault::NO_FAULT) Cluster::error = code;
     if (!Config::configured) Serial.printf("Error %i and brain not reachable", code);
 }
