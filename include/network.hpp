@@ -1,6 +1,5 @@
 #pragma once
 #include <WiFi.h>
-#include "error.hpp"
 #include "constants.h"
 #include <MqttClient.h>
 

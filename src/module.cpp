@@ -22,7 +22,6 @@
 
 #include <Arduino.h>
 #include <chrono>
-#include "error.hpp"
 #include "module.h"
 Module::Module(int pin) {
     this->enable = LOW;
@@ -56,12 +55,16 @@ void Module::load() {
             if (this->sensedFilament()) {
                 engaged = true;
                 start = millis();
-            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) throw TimeAnamoly();
+            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) {
+                // throw TimeAnamoly();
+                // @TODO: use Fault instead
+            }
         } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
-            AppErrorInit init;
-            init.status = 500;
-            init.code = "TIMEOUT";
-            throw ModuleError("Filament swap took too long", init);
+            // @TODO: use Fault instead
+            // AppErrorInit init;
+            // init.status = 500;
+            // init.code = "TIMEOUT";
+            // throw ModuleError("Filament swap took too long", init);
         };
         digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
         delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
@@ -89,13 +92,15 @@ void Module::unLoad() {
                 engaged = false;
                 start = millis();
             } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) {
-                throw TimeAnamoly();
+                // throw TimeAnamoly();
+                // @TODO: use Fault instead
             }
         } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
-            AppErrorInit init;
-            init.status = 500;
-            init.code = "TIMEOUT";
-            throw ModuleError("Filament swap took too long", init);
+            // @TODO: use Fault instead
+            // AppErrorInit init;
+            // init.status = 500;
+            // init.code = "TIMEOUT";
+            // throw ModuleError("Filament swap took too long", init);
         };
         digitalWrite(Constants::SHARED_STEP_PIN, LOW);
         delayMicroseconds(Constants::PLUS_FREQUENCY_MS);

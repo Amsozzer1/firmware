@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <MqttClient.h>
-#include "error.hpp"
 #include "constants.h"
 #include "network.hpp"
 #include "mqtt_esp_client.hpp"
