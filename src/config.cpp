@@ -1,5 +1,4 @@
 #include "config.h"
-#include "cluster.h"
 
 void Config::begin(MqttClient::MessageData& md) {
     if (!Cluster::isAvailable()) return; // @TODO: 

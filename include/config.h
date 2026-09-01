@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 #include "MqttClient.h"
 #include "constants.h"
+#include "cluster.h"
 // ONLY A DATA CLASS
 
 struct pin {
