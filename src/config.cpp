@@ -1,6 +1,8 @@
 #include "config.h"
+#include "cluster.h"
 
 void Config::begin(MqttClient::MessageData& md) {
+    if (!Cluster::isAvailable()) return; // @TODO: 
     const MqttClient::Message& msg = md.message;
 
     DeserializationError err = deserializeJson(
@@ -12,9 +14,16 @@ void Config::begin(MqttClient::MessageData& md) {
         return;
     }
 
-    // @TODO: Update the pin values
+    Config::updatePins();
     Config::configured = true;
     Serial.print("Config: ");
     serializeJson(Config::config, Serial);
     Serial.println();
+}
+
+// @TODO: Update the pin values
+void Config::updatePins() {
+    for (int i = 0; i<Constants::CLUSTER_SIZE; i++) {
+
+    }
 }

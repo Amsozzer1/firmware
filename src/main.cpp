@@ -26,6 +26,8 @@ void setup() {
     client = new Mqtt_ESP_Client(wifiNetwork);
 
     client->setHandler(TopicRegistry::espSetup(), Config::begin);
+    client->setHandler(TopicRegistry::espRequest(), Cluster::handleRequest);
+
     Serial.printf("Your Mac Address is %s \n", TopicRegistry::macStr());
 }
 
