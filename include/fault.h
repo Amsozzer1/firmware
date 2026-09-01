@@ -1,7 +1,4 @@
 #pragma once
-// Deliberately includes nothing: cluster.h pulls this header in mid-definition,
-// so anything Fault touches (Cluster, Config) is still incomplete here. The
-// bodies live in fault.cpp, where both classes are fully defined.
 class Fault {
     public:
         // @TODO: We need a map of ErrorCodes in the brain so we dont bloat the report buffer
