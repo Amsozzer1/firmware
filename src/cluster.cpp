@@ -13,6 +13,7 @@ size_t Cluster::currReport(char* out, size_t outLen) {
     response["connected"] = true;
     response["idle"] = Cluster::isAvailable();
     response["configRev"] = Config::config["configRev"];
+    if (Cluster::error != Fault::NO_FAULT) response["error"] = Cluster::error;
     return serializeJson(response, out, outLen);
 }
 bool Cluster::slotRequired(Cluster::Command cmd) {
