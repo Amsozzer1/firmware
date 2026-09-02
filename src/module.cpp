@@ -109,3 +109,10 @@ void Module::unLoad() {
     }
 
 }
+
+void Module::stop() {
+    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+    digitalWrite(Constants::SHARED_DIR_PIN, LOW);
+    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
+    bool engaged = false;
+}

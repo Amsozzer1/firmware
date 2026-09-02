@@ -8,6 +8,8 @@ class Fault {
         static inline const int MISSING_OR_NO_CMD = -3;
         static inline const int MISSING_SLOT = -4;
         static inline const int BUSY =-5;
+        static inline const int PIN_REFUSED = -6; //@TODO: MEED MORE CONTEXT
+        static inline const int CONFIG_UNPROCESSABLE = -7;
         static void clean();
         static void raise(int code);
 

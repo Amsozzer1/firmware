@@ -5,7 +5,7 @@ Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     // behind and the first run_loop() faulted on it.
     this->network = net;
 
-    this->mqttSystem = new _____System();
+    this->mqttSystem = new SystemTime();
     this->mqttNetwork = new MqttClient::NetworkClientImpl<Client>(net->wifi, *mqttSystem);
     this->mqttLogger = new MqttClient::LoggerImpl<HardwareSerial>(Serial);
     this->mqttSendBuffer = new MqttClient::ArrayBuffer<Constants::BUFFER_SIZE>();

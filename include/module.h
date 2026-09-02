@@ -11,4 +11,5 @@ class Module {
         Module(int);
         void load();
         void unLoad();
+        void stop();
 };

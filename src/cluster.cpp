@@ -15,17 +15,31 @@ size_t Cluster::currReport(char* out, size_t outLen) {
     return serializeJson(response, out, outLen);
 }
 
-
-
-
 void Cluster::handleCommand(Request::request req) {
     switch (req.cmd) {
-        case Request::Command::ABORT:   /*@TODO: HANDLE*/ return;
-        case Request::Command::LOAD:    /*@TODO: HANDLE*/ return;
-        case Request::Command::UNLOAD:  /*@TODO: HANDLE*/ return;
+        case Request::Command::ABORT:   Cluster::abort(req); return;
+        case Request::Command::LOAD:    Cluster::load(req); return;
+        case Request::Command::UNLOAD: Cluster::unLoad(req); return;
         case Request::Command::RESOLVE: Fault::clean(); return;
         case Request::Command::UNKNOWN: return;
-    }
+    }     
+}
+Module* Cluster::pinToModule(int pin) {
+    return Cluster::modules[pin];
+}
 
-     
+void Cluster::abort(Request::request req) {
+    Module* module = Cluster::pinToModule(req.slot);
+    module->stop();
+}
+
+void Cluster::load(Request::request req) {
+    Module* module = Cluster::pinToModule(req.slot);
+    module->load();
+}
+
+void Cluster::unLoad(Request::request req) {
+    Module* module = Cluster::pinToModule(req.slot);
+    module->unLoad();
+
 }
