@@ -5,9 +5,10 @@ bool Request::slotRequired(Request::Command cmd) {
     return cmd == Command::LOAD || cmd == Command::UNLOAD;
 }
 
-bool Request::isInt(JsonVariant slot) {
+bool Request::isSlot(JsonVariant slot) {
     if (slot.isNull() || !slot.is<int>()) return false;
-    return true;
+    int i = slot.as<int>();
+    return i >= 0 && i < Constants::CLUSTER_SIZE;
 }
 
 void Request::handleRequest(const char* json, size_t len) {
@@ -31,14 +32,16 @@ void Request::handleRequest(const char* json, size_t len) {
     }    
 
     req.cmd = cmd;
-    
-    if (Request::slotRequired(cmd) && !isInt(request["slot"])) {
-        Fault::raise(Fault::MISSING_SLOT);
-        return;
+    req.slot = -1;
 
+    if (Request::slotRequired(cmd)) {
+        if (!Request::isSlot(request["slot"])) {
+            Fault::raise(Fault::MISSING_SLOT);
+            return;
+
+        }
+        req.slot = request["slot"];
     }
-
-    req.slot = request["slot"];
 
     if (cmd !=Request::Command::ABORT && !Cluster::isAvailable()) {
         Fault::raise(Fault::BUSY);

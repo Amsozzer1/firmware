@@ -15,16 +15,17 @@ class Cluster
 {
     private:
         static inline Module* active {nullptr};
-        static inline Module* modules[Constants::CLUSTER_SIZE] {};
-        static void abort(Request::request);
         static void load(Request::request);
         static void unLoad(Request::request);
         static Module* pinToModule(int Slot);
     public:
-        static inline int error = 0; 
+        static inline int error = 0;
         static bool isAvailable();
+        static bool tick();
+        static void abort();
         static size_t currReport (char* out, size_t outLen);
         static void handleCommand(Request::request);
+        static inline Module* modules[Constants::CLUSTER_SIZE] {};
 
         
 };

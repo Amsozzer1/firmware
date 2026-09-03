@@ -1,6 +1,7 @@
 #pragma once
 #include <ArduinoJson.h>
 #include "fault.h"
+#include "constants.h"
 class Request {
     
     public:
@@ -12,7 +13,7 @@ class Request {
         };
 
         static bool slotRequired(Command);
-        static bool isInt(JsonVariant);
+        static bool isSlot(JsonVariant);
         static void handleRequest(const char* json, size_t len);
 
     private: 

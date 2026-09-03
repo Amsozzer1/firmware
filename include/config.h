@@ -6,12 +6,14 @@ struct pin { int enablePin{-1}; int sensorPin{-1}; };
 
 class Config {
     private:
+        static void readPins();
         static void updatePins();
         static void unsetPins();
 
     public:
         static void releasePin(int);
         static void usePin(int);
+        static void useInputPin(int);
         static inline JsonDocument config{};
         static inline bool configured {false};
         static inline pin pins[Constants::CLUSTER_SIZE] {};

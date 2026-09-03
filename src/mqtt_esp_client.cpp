@@ -105,10 +105,13 @@ void Mqtt_ESP_Client::run_loop() {
         }
         this->hasAttemptedConnect = true;
         this->lastConnectAttemptMs = now;
+        Cluster::abort();
         this->reconnect();
-        
+
         return;
     }
+
+    const bool moving = Cluster::tick();
 
     // PUBLISH REPORT TO BROKER
     {
@@ -135,5 +138,5 @@ void Mqtt_ESP_Client::run_loop() {
         }
     }
 
-    this->mqtt->yield(500);
+    this->mqtt->yield(moving ? 0 : 500);
 }

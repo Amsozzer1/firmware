@@ -10,6 +10,9 @@
         - NEMA 17 - Stepper Motor
         - Filament Sensor
 
+    Step and dir are shared across the cluster, so the module's own enable pin
+    is the only thing that decides which motor actually turns. It is asserted
+    for the length of a move and released the moment the move ends.
 
     TRAVEL TIME ANOMALY  (nice-to-have)
         Time between the two sensors. Track the running average,
@@ -21,11 +24,21 @@
 */
 
 #include <Arduino.h>
-#include <chrono>
 #include "module.h"
-Module::Module(int pin) {
-    this->enable = LOW;
-    this->id = pin;
+#include "config.h"
+#include "fault.h"
+
+Module::Module(int enable, int sensor) {
+    this->enablePin = enable;
+    this->sensorPin = sensor;
+    this->job = Job::NONE;
+    this->engaged = false;
+    this->start = 0;
+    digitalWrite(this->enablePin, HIGH);  // TMC2209 EN is active low, so HIGH is parked
+}
+
+Module::~Module() {
+    this->stop();
 }
 
 bool Module::sensedFilamentInPrinter() {
@@ -37,82 +50,74 @@ bool Module::sensedFilament() {
     // @TODO: sense filament
     return true;
 }
-void Module::load() {
-    /*
-        LOAD  (filament starts before the module sensor)
-        A) cross module sensor. If not: out of filament, or stuck.
-        B) keep feeding to printer sensor -> stop.
-        First is a health check. Second is where we actually stop.
-    */
-    // SETUP
-    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-    digitalWrite(Constants::SHARED_DIR_PIN, HIGH);
-    bool engaged = false;
-    uint32_t start = millis();
 
-    while (!this->sensedFilamentInPrinter()) {
-        if (!engaged) {
-            if (this->sensedFilament()) {
-                engaged = true;
-                start = millis();
-            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) {
-                // throw TimeAnamoly();
-                // @TODO: use Fault instead
-            }
-        } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
-            // @TODO: use Fault instead
-            // AppErrorInit init;
-            // init.status = 500;
-            // init.code = "TIMEOUT";
-            // throw ModuleError("Filament swap took too long", init);
-        };
-        digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
-        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
-        digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
-    }
-    
+/*
+    LOAD  (filament starts before the module sensor)
+    A) cross module sensor. If not: out of filament, or stuck.
+    B) keep feeding to printer sensor -> stop.
+    First is a health check. Second is where we actually stop.
+
+    UNLOAD is the same walk backwards: leave the printer sensor, then run
+    until the module sensor lets go.
+*/
+void Module::load()   { this->begin(Job::LOAD, HIGH); }
+void Module::unLoad() { this->begin(Job::UNLOAD, LOW); }
+
+void Module::begin(Job job, int dir) {
+    digitalWrite(Config::sharedDirPin, dir);
+    digitalWrite(Config::sharedStepPin, LOW);
+    digitalWrite(this->enablePin, LOW);
+    this->job = job;
+    this->engaged = false;
+    this->start = millis();
 }
 
-void Module::unLoad() {
-    /*
-        UNLOAD
-        A) health check: filament leaves the printer within threshold.
-        If not, throw an error.
-        B) keep unloading until the module sensor stops sensing it.
-    */
-    // SETUP
-    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-    digitalWrite(Constants::SHARED_DIR_PIN, LOW);
-    bool engaged = true;
-    uint32_t start = millis();
-    while (this->sensedFilament()) {
-        if (engaged) {
-            if (!this->sensedFilamentInPrinter()) {
-                engaged = false;
-                start = millis();
-            } else if (millis() - start > Constants::ENGAGE_TIMEOUT_MS) {
-                // throw TimeAnamoly();
-                // @TODO: use Fault instead
-            }
-        } else if (millis() - start > Constants::LOAD_TIMEOUT_MS) {
-            // @TODO: use Fault instead
-            // AppErrorInit init;
-            // init.status = 500;
-            // init.code = "TIMEOUT";
-            // throw ModuleError("Filament swap took too long", init);
-        };
-        digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
-        digitalWrite(Constants::SHARED_STEP_PIN, HIGH);
-        delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
-    }
+bool Module::crossed() {
+    return this->job == Job::LOAD ? this->sensedFilament() : !this->sensedFilamentInPrinter();
+}
 
+bool Module::arrived() {
+    return this->job == Job::LOAD ? this->sensedFilamentInPrinter() : !this->sensedFilament();
+}
+
+// Advances the move by a bounded burst of steps. Returns false once the move
+// is over -- finished or faulted -- and the caller drops us as the active one.
+bool Module::tick() {
+    if (this->job == Job::NONE) return false;
+
+    for (int i = 0; i < Constants::STEPS_PER_TICK; ++i) {
+        if (this->arrived()) { this->stop(); return false; }
+
+        if (!this->engaged) {
+            if (this->crossed()) {
+                this->engaged = true;
+                this->start = millis();
+            } else if (millis() - this->start > Constants::ENGAGE_TIMEOUT_MS) {
+                Fault::raise(Fault::LOAD_TIMEOUT);
+                this->stop();
+                return false;
+            }
+        } else if (millis() - this->start > Constants::LOAD_TIMEOUT_MS) {
+            Fault::raise(Fault::LOAD_TIMEOUT);
+            this->stop();
+            return false;
+        }
+
+        this->pulse();
+    }
+    return true;
+}
+
+void Module::pulse() {
+    digitalWrite(Config::sharedStepPin, HIGH);
+    delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
+    digitalWrite(Config::sharedStepPin, LOW);
+    delayMicroseconds(Constants::PLUS_FREQUENCY_MS);
 }
 
 void Module::stop() {
-    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-    digitalWrite(Constants::SHARED_DIR_PIN, LOW);
-    digitalWrite(Constants::SHARED_STEP_PIN, LOW);
-    bool engaged = false;
+    digitalWrite(Config::sharedStepPin, LOW);
+    digitalWrite(this->enablePin, HIGH);
+    this->job = Job::NONE;
+    this->engaged = false;
 }
