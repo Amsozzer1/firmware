@@ -14,6 +14,7 @@ Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     this->mqttOptions.commandTimeoutMs = 10000;
 
     this->hasAttemptedConnect = false;
+    this->subscribedPrinter = false;
     this->lastConnectAttemptMs = 0;
     this->lastPublishMs = 0;
 
@@ -67,29 +68,28 @@ bool Mqtt_ESP_Client::reconnect() {
         }
     }
 
-    // SUBSCRIBING to ESP Setup - this is config setup
-    {
-        MqttClient::Error::type rc = this->mqtt->subscribe(TopicRegistry::espSetup(), MqttClient::QOS2);
-        if (rc != MqttClient::Error::SUCCESS) {
-            Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
-            this->mqtt->disconnect();
-            this->network->disconnectBroker();
-            return false;
-        }
-    }
+    // ESP Setup is config setup; ESP Request handles a cmd
+    if (!this->subscribe(TopicRegistry::espSetup())) return false;
+    if (!this->subscribe(TopicRegistry::espRequest())) return false;
 
-    // SUBSCRIBING to ESP Request - this Handles a cmd
-    {
-        MqttClient::Error::type rc = this->mqtt->subscribe(TopicRegistry::espRequest(), MqttClient::QOS2);
-        if (rc != MqttClient::Error::SUCCESS) {
-            Serial.printf("MQTT: subscribe error %i, dropping connection\n", rc);
-            this->mqtt->disconnect();
-            this->network->disconnectBroker();
-            return false;
-        }
+    this->subscribedPrinter = false;
+    if (Config::configured) {
+        if (!this->subscribe(TopicRegistry::printerReport())) return false;
+        this->subscribedPrinter = true;
     }
 
     Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::espSetup());
+    return true;
+}
+
+bool Mqtt_ESP_Client::subscribe(const char* topic) {
+    MqttClient::Error::type rc = this->mqtt->subscribe(topic, MqttClient::QOS2);
+    if (rc != MqttClient::Error::SUCCESS) {
+        Serial.printf("MQTT: subscribe error %i on %s, dropping connection\n", rc, topic);
+        this->mqtt->disconnect();
+        this->network->disconnectBroker();
+        return false;
+    }
     return true;
 }
 
@@ -109,6 +109,13 @@ void Mqtt_ESP_Client::run_loop() {
         this->reconnect();
 
         return;
+    }
+
+    // A config that lands after we are already connected brings the printer
+    // topic with it, so pick up the subscription here rather than on reconnect.
+    if (Config::configured && !this->subscribedPrinter) {
+        if (!this->subscribe(TopicRegistry::printerReport())) return;
+        this->subscribedPrinter = true;
     }
 
     const bool moving = Cluster::tick();

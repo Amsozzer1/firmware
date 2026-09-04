@@ -17,7 +17,7 @@ public:
         build(espRequest_,    "esp/",     "/request"); // Read this to know when we get load/unload command is recieved 
     }
 
-    static void setPrinter(char* printerId) {
+    static void setPrinter(const char* printerId) {
         build(printerReport_, "printer/", "/report", printerId); // to read printer state -> filamentPresenceSensor
     }
     static const uint8_t* mac()    { return mac_; }

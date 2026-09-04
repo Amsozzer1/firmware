@@ -42,13 +42,12 @@ Module::~Module() {
 }
 
 bool Module::sensedFilamentInPrinter() {
-    // @TODO: sense filament
-    return true;
+    return Module::filemantSensedInPrinter || false;
 }
 
 bool Module::sensedFilament() {
-    // @TODO: sense filament
-    return true;
+    // @TODO: sense filament - we read this from the report
+    return false;
 }
 
 /*
@@ -120,4 +119,23 @@ void Module::stop() {
     digitalWrite(this->enablePin, HIGH);
     this->job = Job::NONE;
     this->engaged = false;
+}
+
+void Module::setFilamentSensedInPrinter(const char *json, size_t len) {
+    JsonDocument request;
+
+    DeserializationError err = deserializeJson(request, json, len);
+    if (err) {
+        // @TODO: add a better error code here
+        Fault::raise(Fault::REQ_UNPROCESSABLE);
+        return;
+    }
+    const JsonVariant value = request["sensed"];
+    if (!value.is<bool>()) {
+        // @TODO: add a better error code here
+        Fault::raise(Fault::REQ_UNPROCESSABLE);
+        return;
+    }
+
+    Module::filemantSensedInPrinter=value;
 }

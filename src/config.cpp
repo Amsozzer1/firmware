@@ -6,7 +6,9 @@ void Config::apply(const char* json, size_t len) {
     JsonDocument tmp;
     DeserializationError err = deserializeJson(tmp, json, len);
     if (err) { Fault::raise(Fault::CONFIG_UNPROCESSABLE); return; }
-    if (!tmp["sharedStepPin"].is<int>() || !tmp["sharedDirPin"].is<int>()) {
+    if (!tmp["sharedStepPin"].is<int>() || !tmp["sharedDirPin"].is<int>() || 
+        !tmp["printerId"].is<const char *>()
+    ) {
         Fault::raise(Fault::CONFIG_UNPROCESSABLE);
         return;
     }
@@ -14,6 +16,7 @@ void Config::apply(const char* json, size_t len) {
     Config::config = tmp;
     Config::readPins();
     Config::updatePins();
+    TopicRegistry::setPrinter(tmp["printerId"]);
     Config::configured = true;
 }
 

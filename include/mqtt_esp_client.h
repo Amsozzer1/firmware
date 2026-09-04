@@ -25,9 +25,11 @@ class Mqtt_ESP_Client {
     MqttClient::Options mqttOptions;
 
     bool hasAttemptedConnect;
+    bool subscribedPrinter;
     unsigned long lastConnectAttemptMs;
     unsigned long lastPublishMs;
     bool reconnect();
+    bool subscribe(const char*);
 
     public:
         Mqtt_ESP_Client(WifiNetwork*);
