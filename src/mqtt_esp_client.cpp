@@ -1,5 +1,9 @@
 #include "mqtt_esp_client.h"
 
+static void onPrinterReport(MqttClient::MessageData& md) {
+    Cluster::setPrinterReport((const char*)md.message.payload, md.message.payloadLen);
+}
+
 Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     // This assignment was missing, so `this->network` held whatever `new` left
     // behind and the first run_loop() faulted on it.
@@ -14,7 +18,7 @@ Mqtt_ESP_Client::Mqtt_ESP_Client(WifiNetwork* net) {
     this->mqttOptions.commandTimeoutMs = 10000;
 
     this->hasAttemptedConnect = false;
-    this->subscribedPrinter = false;
+    this->printerTopic[0] = '\0';
     this->lastConnectAttemptMs = 0;
     this->lastPublishMs = 0;
 
@@ -72,13 +76,28 @@ bool Mqtt_ESP_Client::reconnect() {
     if (!this->subscribe(TopicRegistry::espSetup())) return false;
     if (!this->subscribe(TopicRegistry::espRequest())) return false;
 
-    this->subscribedPrinter = false;
-    if (Config::configured) {
-        if (!this->subscribe(TopicRegistry::printerReport())) return false;
-        this->subscribedPrinter = true;
-    }
+    this->printerTopic[0] = '\0';
+    if (!this->syncPrinter()) return false;
 
     Serial.printf("MQTT: connected, subscribed to %s\n", TopicRegistry::espSetup());
+    return true;
+}
+
+bool Mqtt_ESP_Client::syncPrinter() {
+    const char* topic = TopicRegistry::printerReport();
+    if (strcmp(this->printerTopic, topic) == 0) return true;
+
+    if (this->printerTopic[0] != '\0') this->mqtt->unsubscribe(this->printerTopic);
+    this->printerTopic[0] = '\0';
+
+    if (!this->mqttMessageHandlers->set(topic, onPrinterReport)) {
+        Serial.printf("MQTT: no handler slot for %s\n", topic);
+        return true;  // nothing to route it to, but the connection is fine
+    }
+    if (!this->subscribe(topic)) return false;
+
+    strncpy(this->printerTopic, topic, sizeof(this->printerTopic) - 1);
+    this->printerTopic[sizeof(this->printerTopic) - 1] = '\0';
     return true;
 }
 
@@ -111,12 +130,8 @@ void Mqtt_ESP_Client::run_loop() {
         return;
     }
 
-    // A config that lands after we are already connected brings the printer
-    // topic with it, so pick up the subscription here rather than on reconnect.
-    if (Config::configured && !this->subscribedPrinter) {
-        if (!this->subscribe(TopicRegistry::printerReport())) return;
-        this->subscribedPrinter = true;
-    }
+    // A config can land, or change the printer, long after we connected.
+    if (!this->syncPrinter()) return;
 
     const bool moving = Cluster::tick();
 

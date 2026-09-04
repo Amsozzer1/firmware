@@ -30,8 +30,9 @@ public:
     static const char* espRequest()    { return espRequest_; }
     static const char* espSetup()      { return espSetup_; }
 
-private:
     static constexpr size_t kMaxTopic = 64;
+
+private:
 
     static void build(char* out, const char* prefix, const char* suffix, const char* id=macStr_) {
         char* w = out;

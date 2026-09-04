@@ -25,11 +25,12 @@ class Mqtt_ESP_Client {
     MqttClient::Options mqttOptions;
 
     bool hasAttemptedConnect;
-    bool subscribedPrinter;
+    char printerTopic[TopicRegistry::kMaxTopic];
     unsigned long lastConnectAttemptMs;
     unsigned long lastPublishMs;
     bool reconnect();
     bool subscribe(const char*);
+    bool syncPrinter();
 
     public:
         Mqtt_ESP_Client(WifiNetwork*);

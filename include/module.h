@@ -16,7 +16,6 @@ class Module {
         Job job;
         bool engaged;
         uint32_t start;
-        static inline bool filemantSensedInPrinter = false;
 
     public:
         Module(int, int);
@@ -25,5 +24,4 @@ class Module {
         void unLoad();
         void stop();
         bool tick();
-        static void setFilamentSensedInPrinter(const char *json, size_t len);
 };

@@ -15,6 +15,29 @@ size_t Cluster::currReport(char* out, size_t outLen) {
     return serializeJson(response, out, outLen);
 }
 
+bool Cluster::sensedFilamentInPrinter() {
+    return Cluster::filamentInPrinter;
+}
+
+void Cluster::setPrinterReport(const char* json, size_t len) {
+    JsonDocument report;
+
+    DeserializationError err = deserializeJson(report, json, len);
+    if (err) {
+        // @TODO: add a better error code here
+        Fault::raise(Fault::REQ_UNPROCESSABLE);
+        return;
+    }
+    JsonVariant sensed = report["sensed"];
+    if (!sensed.is<bool>()) {
+        // @TODO: add a better error code here
+        Fault::raise(Fault::REQ_UNPROCESSABLE);
+        return;
+    }
+
+    Cluster::filamentInPrinter = sensed;
+}
+
 bool Cluster::tick() {
     if (Cluster::active == nullptr) return false;
     if (!Cluster::active->tick()) Cluster::active = nullptr;

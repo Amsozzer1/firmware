@@ -20,9 +20,6 @@ void onRequest(MqttClient::MessageData& md) {
     Request::handleRequest((const char*)md.message.payload, md.message.payloadLen);
 }
 
-void onPrinterReport(MqttClient::MessageData& md) {
-    Module::setFilamentSensedInPrinter((const char*)md.message.payload, md.message.payloadLen);
-}
 
 void setup() {
     Serial.begin(115200, SERIAL_8N1);
@@ -38,7 +35,6 @@ void setup() {
 
     client->setHandler(TopicRegistry::espSetup(), onSetup);
     client->setHandler(TopicRegistry::espRequest(), onRequest);
-    client->setHandler(TopicRegistry::printerReport(), onPrinterReport);
 
     Serial.printf("Your Mac Address is %s \n", TopicRegistry::macStr());
 }
